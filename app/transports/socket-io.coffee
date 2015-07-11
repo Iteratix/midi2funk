@@ -22,5 +22,9 @@ io.on "connection", (socket) ->
     message: "Hello Earthling"
     data   : any_dummy_date: can_come_here: on
 
+  # socket.on "launchpad-key-color", (msg) ->
+  #   console.log msg
 
-module.exports = ( message ) -> io.sockets.send message
+module.exports = ( message ) -> 
+  io.sockets.send message
+  console.log 'sent '+ message

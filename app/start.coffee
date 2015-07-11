@@ -7,6 +7,8 @@ emit = require './transports/socket-io'
 
 # Set up a new input.
 input = new midi.input()
+midiConnector = {}
+launchpad = {}
 
 # Sysex, timing, and active sensing messages are ignored
 # by default. To enable these message types, pass false for
@@ -15,13 +17,21 @@ input = new midi.input()
 # For example if you want to receive only MIDI Clock beats
 # you should use 
 # input.ignoreTypes(true, false, true)
-input.ignoreTypes false, false, false
+#input.ignoreTypes false, false, false
 
-input.on "message", (deltaTime, message) ->
+initLaunchpad = (portIndex) ->
+	input.openPort portIndex
+	midiConnector = require('midi-launchpad').connect(portIndex)
+	console.log " - Listening MIDI"
 
-	emit
-		deltaTime: deltaTime
-		message  : message
+	midiConnector.on "ready", (pad) ->
+	  console.log "Launchpad ready"
+	  
+	  pad.on "press", (btn) ->
+	  	#console.log btn
+	  	console.log 'btn '+ btn.x + ' '+ btn.y
+			emit 'foobar'
+
 
 # Get the name of a specified input port.
 console.log ' + Helloooo'
@@ -40,11 +50,7 @@ inquirer.prompt
 	message : 'Please select your midi input' # select you midi input bitch
 	choices : inputs
 , ( answer ) ->
-	input.openPort answer.port_index
-
-	console.log " - Listening MIDI"
-
-
+	initLaunchpad(answer.port_index)
 
 
 
