@@ -1,4 +1,4 @@
-Simple midi to javascript ( actually [coffee-script](http://coffeescript.org/) ) function mapper.
+Simple midi to javascript ( actually [coffee-script](http://coffeescript.org/) ) function mapper. MODIFIED BY US TO WORK WITH LAUNCHPAD SPECIFICALLY.
 
 ## install instructions
 
