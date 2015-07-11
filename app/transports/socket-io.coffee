@@ -8,9 +8,14 @@ handler = (req, res) ->
     return
 
 app = require("http").createServer(handler)
-
 io = require("socket.io")(app)
 fs = require("fs")
+
+Backbone = require 'backbone'
+_ = require 'underscore'
+
+channel = {}
+_.extend channel, Backbone.Events
 
 app.listen 1337
 
@@ -22,9 +27,9 @@ io.on "connection", (socket) ->
     message: "Hello Earthling"
     data   : any_dummy_date: can_come_here: on
 
-  # socket.on "launchpad-key-color", (msg) ->
-  #   console.log msg
+  socket.on "launchpad-key-color", (msg) ->
+    console.log "got a key color"
+    channel.trigger('launchpad-key-color', msg)
 
-module.exports = ( message ) -> 
-  io.sockets.send message
-  console.log 'sent '+ message
+module.exports.sendMessage = ( message ) -> io.sockets.send message
+module.exports.channel = channel

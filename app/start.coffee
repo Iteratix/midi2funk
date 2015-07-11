@@ -1,23 +1,23 @@
 midi     = require 'midi'
-
-inquirer = require "inquirer"
+inquirer = require 'inquirer'
 
 # requiring our default transport, so the socket server gets initiated
 emit = require './transports/socket-io'
+channel = emit.channel
 
 # Set up a new input.
 input = new midi.input()
 midiConnector = {}
 launchpad = {}
 
-# Sysex, timing, and active sensing messages are ignored
-# by default. To enable these message types, pass false for
-# the appropriate type in the function below.
-# Order: (Sysex, Timing, Active Sensing)
-# For example if you want to receive only MIDI Clock beats
-# you should use 
-# input.ignoreTypes(true, false, true)
-#input.ignoreTypes false, false, false
+mapButtonToLaunchpad = (note) -> 
+  if note % 8 == 0 && ((note / 8) % 2 == 1)
+      return [8, Math.floor(note / 8 / 2)]
+
+  x = note % 8
+  y = Math.floor(note / 8) / 2
+  return [x, y]
+
 
 initLaunchpad = (portIndex) ->
 	input.openPort portIndex
@@ -26,12 +26,20 @@ initLaunchpad = (portIndex) ->
 
 	midiConnector.on "ready", (pad) ->
 	  console.log "Launchpad ready"
-	  
-	  pad.on "press", (btn) ->
-	  	#console.log btn
-	  	console.log 'btn '+ btn.x + ' '+ btn.y
-			emit 'foobar'
+	  launchpad = pad
 
+	  launchpad.on "press", (btn) ->
+	  	emit.sendMessage
+	  		x: btn.x
+	  		y: btn.y
+	  		state: btn.getState()
+	  		special: btn.special
+	  		note: btn.toNote()
+
+channel.on 'launchpad-key-color', (msg) ->
+	map = mapButtonToLaunchpad(msg[0])
+	button = launchpad.getButton(map[0],map[1])
+	button.light(launchpad.colors.red.high)
 
 # Get the name of a specified input port.
 console.log ' + Helloooo'
