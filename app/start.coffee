@@ -8,40 +8,17 @@ channel = emit.channel
 # Set up a new input.
 input = new midi.input()
 midiConnector = {}
-launchpad = {}
 
-mapButtonToLaunchpad = (note) -> 
-  if note % 8 == 0 && ((note / 8) % 2 == 1)
-      return [8, Math.floor(note / 8 / 2)]
-
-  x = note % 8
-  y = Math.floor(note / 8) / 2
-  return [x, y]
-
-
-initLaunchpad = (portIndex) ->
+initPort = (portIndex) ->
 	input.openPort portIndex
-	midiConnector = require('midi-launchpad').connect(portIndex)
 	console.log " - Listening MIDI"
 
-	midiConnector.on "ready", (pad) ->
-	  console.log "Launchpad ready"
-	  launchpad = pad
+	input.on "message", (deltaTime, msg) ->
+	  console.log "Received message", msg
 
-	  launchpad.on "press", (btn) ->
-	  	emit.sendMessage
-	  		x: btn.x
-	  		y: btn.y
-	  		state: btn.getState()
-	  		special: btn.special
-	  		note: btn.toNote()
+  	emit.sendMessage
+      hey: 'test'
 
-channel.on 'launchpad-key-color', (msg) ->
-	map = mapButtonToLaunchpad(msg[0])
-	button = launchpad.getButton(map[0],map[1])
-	button.light(launchpad.colors.red.high)
-
-# Get the name of a specified input port.
 console.log ' + Helloooo'
 
 inputs = []
@@ -58,7 +35,7 @@ inquirer.prompt
 	message : 'Please select your midi input' # select you midi input bitch
 	choices : inputs
 , ( answer ) ->
-	initLaunchpad(answer.port_index)
+	initPort(answer.port_index)
 
 
 
