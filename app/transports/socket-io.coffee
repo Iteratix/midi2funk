@@ -27,9 +27,5 @@ io.on "connection", (socket) ->
     message: "Hello Earthling"
     data   : any_dummy_date: can_come_here: on
 
-  socket.on "launchpad-key-color", (msg) ->
-    console.log "got a key color"
-    channel.trigger('launchpad-key-color', msg)
-
 module.exports.sendMessage = ( message ) -> io.sockets.send message
 module.exports.channel = channel
